@@ -34,7 +34,11 @@ if defined?(::Resque)
 
   # In the fork, stop the normal agent startup
   # and stop listening to the pipe (we'll only use it for writing)
+  current_after_fork = Resque.after_fork
+
   Resque.after_fork do |job|
+    current_after_fork.call(job)
+
     Appsignal.agent.stop_thread
     Appsignal::Pipe.current.stop_listening!
   end
